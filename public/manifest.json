@@ -21,13 +21,24 @@
           "js": ["js/vendor.js", "js/content_script.js"]
       }
   ],
-
+  "web_accessible_resources": [
+    "js/case.js",
+    "js/vendor.js",
+    "case.html"
+  ],
   "background": {
     "scripts": ["js/vendor.js", "js/background.js"]
   },
 
   "permissions": [
+    "fileSystemProvider",
     "storage",
     "<all_urls>"
-  ]
+  ],
+  "file_system_provider_capabilities": {
+    "configurable": true,
+    "watchable": false,
+    "multiple_mounts": true,
+    "source": "device"
+  }
 }
