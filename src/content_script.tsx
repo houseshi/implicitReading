@@ -113,6 +113,16 @@ class Content {
       }
     }
   }
+  berforunLoad = (e:BeforeUnloadEvent)=>{
+
+    this.currentFile.rate = this.book.rendition.currentLocation().index
+  }
+  onblur = (e:FocusEvent)=>{
+
+  }
+  visibilitychange = (e:Event)=>{
+
+  }
   constructor() {
     this.caseDiv = document.createElement('div');
     this.caseTitle = document.createElement('h3');
@@ -124,7 +134,11 @@ class Content {
       bold:[],
       rate:0,
       active:true}
-
+      window.onbeforeunload = this.berforunLoad
+      window.onblur = this.onblur
+      document.addEventListener('visibilitychange',this.visibilitychange)
   }
 }
 new Content()
+
+
