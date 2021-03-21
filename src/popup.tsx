@@ -43,24 +43,32 @@ export default class Popup extends Component {
   }
   removeBooks = (id:number) => {
     const {files} = this.state 
-    const newFiles=  files.filter( (file:FileMoudle) =>{
+    const newFiles=  files.map( (file:FileMoudle) =>{
       if(id !== file.key){
           return file
       }
     })
-    this.setState({files:newFiles});
+    if(newFiles.length==1 && newFiles[0]==undefined){
+      this.setState({files:[]});
+      chrome.storage.local.set({files:[]})
+    }else{
+      this.setState({files:newFiles});
+      chrome.storage.local.set({files:newFiles})
+    }
   }
   readBook =(id:number):void =>{
     const { files } = this.state;
+    let file =null
     const newFs = files.map( (f:FileMoudle) =>{
       if(f.key == id){
         f.active = true
       }
+      file =f
       return f
     })
     this.setState({files:newFs})
     chrome.storage.local.set({ files: newFs });
-    chrome.runtime.sendMessage(id)
+    chrome.runtime.sendMessage(file)
   }
   render() {
     const { files } = this.state;
