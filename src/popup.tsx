@@ -90,7 +90,7 @@ export default class Popup extends Component {
                             <MinusCircleOutlined onClick={()=>this.removeBooks(file.key) }/>
                         </List.Item>
                         <div style={{ width: 220 }}>
-                          <Progress percent={file.rate} size="small" />
+                          <Progress percent={file.percentage || 0} size="small" />
                         </div>
                       </div>
                     )
@@ -104,11 +104,14 @@ export default class Popup extends Component {
         <Footer>
           {/* accept="application/epub+zip  , text/plain" */}
             <Upload  showUploadList={false}
+            
              accept="application/epub+zip" onChange={(info) => {
               if (info.file.status === 'done') {
                 // message.success(`${info.file.name} file uploaded successfully`);
-                this.addBooks(info);
+              this.state.files.length>=1 ? message.error(`一次只看一本吧！`)
+                  : (this.addBooks(info) ,message.success(`阅读愉快！！！`))
               }
+            
             }}>
               <Button icon={<UploadOutlined />}>添加新书</Button>
             </Upload>

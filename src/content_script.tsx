@@ -1,12 +1,12 @@
-import Epub, { Book, Rendition } from "epubjs"
-import ePub from "epubjs"
+// import Epub, { Book, Rendition } from "epubjs"
+import ePub, { Book } from "epubjs"
 import FileMoudle from "./FileMoudle"
 import FileUtils from "./FileUtils"
 class Content {
   caseDiv: HTMLElement
   caseTitle: HTMLElement
   caseContent: HTMLElement
-  book = ePub() 
+  book:any
   currentFile:FileMoudle 
 
   linstenerMessage() {
@@ -20,7 +20,7 @@ class Content {
     this.caseDiv.style.position = "absolute"
     this.caseDiv.style.paddingTop = "10px"
     this.caseDiv.style.width = "720px"
-    this.caseDiv.style.height = "720px"
+    this.caseDiv.style.height = "100%"
     this.caseDiv.style.backgroundColor = "#fcf8e38c"
     this.caseDiv.className = "drag"
     this.caseDiv.style.zIndex = "10000000"
@@ -64,6 +64,7 @@ class Content {
     // const book = Epub("http://www.jobwaitin.com/image/%E5%83%8F%E5%93%B2%E5%AD%A6%E5%AE%B6%E4%B8%80%E6%A0%B7%E7%94%9F%E6%B4%BB.epub");
     // let file: FileMoudle = files.find(f => f.active == true)!
     let arr = FileUtils.arrToBuffer(file.bold)
+    this.book = ePub()
     this.book.open(arr)
     this.currentFile = file
     const rendition = this.book.renderTo(this.caseDiv, {
@@ -72,18 +73,26 @@ class Content {
       height: "720px",
     })
     rendition.display(file.rate)
+    rendition.on("relocated", (location:any)=>{
+      this.currentFile.rate = location.end.cfi
+      // this.currentFile.percentage = this.book.locations.percentageFromCfi(location.end.cfi)
+    });
     document.addEventListener("keyup", this.keydonw)
-    // chrome.storage.local.get({files:false}, item =>{
-    //   if(item.files!= false){
-    //     const {files} = item
-    //     const f =  files.find( (f:FileMoudle) => f.active == true)
-    //     const arr = FileUtils.arrToBuffer(f.bold)
-    //   }
-    // })
+
+    // 监听页面 出现变动储存进度
+    window.onbeforeunload = this.setFileReta
+    window.onblur = this.setFileReta
+    document.addEventListener('visibilitychange',this.setFileReta)
   }
   removeCase() {
+    this.setFileReta()
     this.caseDiv.remove()
+    // 移除界面的监听
     document.removeEventListener("keyup", this.keydonw)
+    window.onbeforeunload = null
+    window.onblur = null
+    document.removeEventListener('visibilitychange',this.setFileReta)
+    this.book.destroy()
   }
   keydonw = (ex: KeyboardEvent) => {
     const { clientWidth, clientHeight } = this.caseDiv
@@ -108,20 +117,30 @@ class Content {
         //   this.caseDiv.style.height = newHH +"px"
         //   this.rendition.resize(clientWidth,newHH)
         // break
+        case " ":
+          this.removeCase()
         default:
           break;
       }
     }
   }
-  berforunLoad = (e:BeforeUnloadEvent)=>{
-
-    this.currentFile.rate = this.book.rendition.currentLocation().index
-  }
-  onblur = (e:FocusEvent)=>{
-
-  }
-  visibilitychange = (e:Event)=>{
-
+  /**
+   * 设置书籍进度
+   */
+  setFileReta = ()=>{
+    chrome.storage.local.get({files:false}, item=>{
+      if(item.files !== false){
+        const {files} = item
+        const newFiles:Array<FileMoudle> = files.map( (f:FileMoudle)=>{
+            if(f.key == this.currentFile.key){
+              f = this.currentFile
+            }
+          return f
+        })
+        // console.log(newFiles)
+        chrome.storage.local.set({files:newFiles})
+      }  
+    })
   }
   constructor() {
     this.caseDiv = document.createElement('div');
@@ -132,12 +151,11 @@ class Content {
     this.currentFile = {key:1,
       name:"string",
       bold:[],
-      rate:0,
-      active:true}
-      window.onbeforeunload = this.berforunLoad
-      window.onblur = this.onblur
-      document.addEventListener('visibilitychange',this.visibilitychange)
-  }
+      rate:"",
+      active:true,
+      percentage:0}
+      
+  } 
 }
 new Content()
 
