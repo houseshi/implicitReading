@@ -27,11 +27,6 @@
       ]
     }
   ],
-  "web_accessible_resources": [
-    "js/case.js",
-    "js/vendor.js",
-    "case.html"
-  ],
   "background": {
     "scripts": [
       "js/vendor.js",

@@ -1,5 +1,5 @@
 // import Epub, { Book, Rendition } from "epubjs"
-import ePub, { Book } from "epubjs"
+import ePub from "epubjs"
 import FileMoudle from "./FileMoudle"
 import FileUtils from "./FileUtils"
 class Content {
