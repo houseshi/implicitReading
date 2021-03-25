@@ -6,7 +6,7 @@ class Content {
   caseDiv: HTMLElement
   caseTitle: HTMLElement
   caseContent: HTMLElement
-  book:any
+  book = ePub()
   currentFile:FileMoudle 
 
   linstenerMessage() {
@@ -18,10 +18,11 @@ class Content {
   }
   initCase() {
     this.caseDiv.style.position = "absolute"
-    this.caseDiv.style.paddingTop = "10px"
+    this.caseDiv.style.paddingTop = "30px"
     this.caseDiv.style.width = "720px"
-    this.caseDiv.style.height = "100%"
+    this.caseDiv.style.height = "650px"
     this.caseDiv.style.backgroundColor = "#fcf8e38c"
+
     this.caseDiv.className = "drag"
     this.caseDiv.style.zIndex = "10000000"
     this.caseDiv.style.overflowY = "hidden"
@@ -68,10 +69,18 @@ class Content {
     this.book.open(arr)
     this.currentFile = file
     const rendition = this.book.renderTo(this.caseDiv, {
+      manager:"continuous",
       flow: "scrolled-doc",
       width: "720px",
-      height: "720px",
+      height: "600px",
     })
+    // const rendition = this.book.renderTo(this.caseDiv, {
+    //   manager: "continuous",
+    //   // flow: "paginated",
+    //   width: "720px",
+    //   height: "720px"
+    // });
+
     rendition.display(file.rate)
     rendition.on("relocated", (location:any)=>{
       this.currentFile.rate = location.end.cfi
@@ -104,7 +113,6 @@ class Content {
       switch (ex.key) {
         case "ArrowLeft":
           this.book.rendition.prev()
-          
           break;
         case "ArrowRight":
           this.book.rendition.next()
